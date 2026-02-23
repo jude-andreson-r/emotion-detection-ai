@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Emotion AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial; text-align: center; margin-top: 60px; }
+    h1 { color: #009999; }
+  </style>
+</head>
+<body>
+
+<h1>Emotion Detection System</h1>
+<p id="emotion">Waiting for emotion...</p>
+
+<script>
+setInterval(() => {
+  fetch("http://127.0.0.1:5000/emotion")
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("emotion").innerText =
+        `Emotion: ${data.emotion.toUpperCase()} (${data.confidence.toFixed(1)}%)`;
+    });
+}, 2000);
+</script>
+
+</body>
+</html>

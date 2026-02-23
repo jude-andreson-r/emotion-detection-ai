@@ -1,0 +1,117 @@
+from deepface import DeepFace
+import cv2
+from datetime import datetime
+from spotify_map import open_spotify
+
+cap = cv2.VideoCapture(0)
+
+TEXT_COLOR = (0, 200, 200)  # Professional cyan
+
+last_emotion = None              # Last detected emotion
+last_spotify_emotion = None      # Last emotion used for Spotify
+user_prompt_active = False       # Whether prompt is shown
+
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    try:
+        result = DeepFace.analyze(
+            frame,
+            actions=['emotion'],
+            enforce_detection=False
+        )
+
+        # ===== EMOTION SCORES =====
+        emotion_scores = result[0]['emotion']
+        emotion = result[0]['dominant_emotion']
+        confidence = emotion_scores[emotion]
+
+        # ===== TOP 3 EMOTIONS (FOR CLARITY) =====
+        top_emotions = sorted(
+            emotion_scores.items(),
+            key=lambda x: x[1],
+            reverse=True
+        )[:3]
+
+        # ===== TERMINAL TEXT (PROFESSIONAL LOG) =====
+        if emotion != last_emotion:
+            time_now = datetime.now().strftime("%H:%M:%S")
+            print(f"[INFO] {time_now} | Emotion detected")
+            print(f"[RESULT] Dominant: {emotion} | Confidence: {confidence:.1f}%")
+            print("Top emotions:")
+            for emo, score in top_emotions:
+                print(f"  - {emo}: {score:.1f}%")
+            print()
+
+            user_prompt_active = True
+            last_emotion = emotion
+
+        # ===== CAMERA UI =====
+        overlay = frame.copy()
+        cv2.rectangle(overlay, (10, 10), (380, 130), (0, 0, 0), -1)
+        frame = cv2.addWeighted(overlay, 0.25, frame, 0.75, 0)
+
+        # Dominant emotion
+        main_text = f"{emotion.upper()} ({confidence:.1f}%)"
+        cv2.putText(
+            frame,
+            main_text,
+            (20, 40),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.75,
+            TEXT_COLOR,
+            2
+        )
+
+        # Top-3 emotions (clarity)
+        y_offset = 65
+        for emo, score in top_emotions:
+            cv2.putText(
+                frame,
+                f"{emo}: {score:.1f}%",
+                (20, y_offset),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.45,
+                (200, 200, 200),
+                1
+            )
+            y_offset += 18
+
+        # ===== USER PROMPT =====
+        if user_prompt_active:
+            prompt = "Need music for your mood?  Y = Yes | N = No"
+            cv2.putText(
+                frame,
+                prompt,
+                (20, 120),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.45,
+                (255, 255, 0),
+                1
+            )
+
+    except Exception as e:
+        print("[ERROR]", e)
+
+    cv2.imshow("Emotion AI", frame)
+
+    # ===== KEY HANDLING =====
+    key = cv2.waitKey(1) & 0xFF
+
+    if key == ord('y') and user_prompt_active:
+        if emotion != last_spotify_emotion:
+            open_spotify(emotion)
+            last_spotify_emotion = emotion
+        user_prompt_active = False
+
+    elif key == ord('n') and user_prompt_active:
+        print("[INFO] User declined music recommendation\n")
+        user_prompt_active = False
+
+    elif key == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()

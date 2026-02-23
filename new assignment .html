@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Full Stack Development Course Survey</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f2f5;
+      padding: 20px;
+    }
+    .survey-container {
+      max-width: 650px;
+      margin: auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: 600;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    input[type="radio"],
+    input[type="checkbox"] {
+      margin-right: 8px;
+    }
+
+    button {
+      margin-top: 25px;
+      width: 100%;
+      padding: 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .thank-you {
+      text-align: center;
+      display: none;
+      color: green;
+      font-size: 18px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="survey-container">
+    <h1>Full Stack Development Course Survey</h1>
+    <form id="surveyForm">
+      <label for="name">Your Name:</label>
+      <input type="text" id="name" name="name" required />
+
+      <label for="email">Email Address:</label>
+      <input type="email" id="email" name="email" required />
+
+      <label>What is your current coding experience level?</label>
+      <select name="experience" required>
+        <option value="">--Select--</option>
+        <option value="Beginner">Beginner</option>
+        <option value="Intermediate">Intermediate</option>
+        <option value="Advanced">Advanced</option>
+      </select>
+
+      <label>Which technologies are you most interested in? (Select all that apply)</label>
+      <input type="checkbox" name="tech" value="HTML/CSS" /> HTML/CSS
+      <input type="checkbox" name="tech" value="JavaScript" /> JavaScript
+      <input type="checkbox" name="tech" value="React" /> React
+      <input type="checkbox" name="tech" value="Node.js" /> Node.js
+      <input type="checkbox" name="tech" value="MongoDB" /> MongoDB
+      <input type="checkbox" name="tech" value="Python/Django" /> Python/Django
+
+      <label>Why do you want to take a Full Stack Development course?</label>
+      <textarea name="goal" rows="4" placeholder="Your goals, reasons, or expectations..." required></textarea>
+
+      <label>Would you prefer a self-paced or live-instructor course?</label>
+      <input type="radio" name="mode" value="Self-paced" required /> Self-paced
+      <input type="radio" name="mode" value="Live Instructor" /> Live Instructor
+      <input type="radio" name="mode" value="Hybrid" /> Hybrid (Both)
+
+      <button type="submit">Submit Survey</button>
+    </form>
+
+    <div class="thank-you" id="thankYouMessage">
+      Thank you for your submission! We'll be in touch soon.
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("surveyForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const form = e.target;
+      const formData = new FormData(form);
+
+      const name = formData.get("name");
+      const email = formData.get("email");
+      const experience = formData.get("experience");
+      const goal = formData.get("goal");
+      const mode = formData.get("mode");
+
+      const technologies = formData.getAll("tech");
+
+      // Simulate submission (e.g., you can integrate with backend here)
+      console.log("Survey Data:", {
+        name,
+        email,
+        experience,
+        technologies,
+        goal,
+        mode
+      });
+
+      // Reset and show thank you
+      form.reset();
+      document.getElementById("thankYouMessage").style.display = "block";
+
+      setTimeout(() => {
+        document.getElementById("thankYouMessage").style.display = "none";
+      }, 5000);
+    });
+  </script>
+</body>
+</html>
+
+
